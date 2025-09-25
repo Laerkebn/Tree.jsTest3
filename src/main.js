@@ -5,7 +5,7 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 
 // Scene
 const scene = new THREE.Scene()
-scene.background = new THREE.Color(0x0000ff)
+scene.background = new THREE.Color(0xFFC700)
 
 // Camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 1000)
@@ -18,60 +18,50 @@ renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 
 // Lys
-const directionalLight = new THREE.DirectionalLight(0x8F756E, 1)
+const directionalLight = new THREE.DirectionalLight(0xff0000, 1)
 directionalLight.position.set(2, 1, 2)
 scene.add(directionalLight)
 
-const ambientLight = new THREE.AmbientLight(0x3D2B25, 0.5)
+const ambientLight = new THREE.AmbientLight(0x781111, 0.5)
 scene.add(ambientLight)
 
 // Baggrund
 const imgLoad = new THREE.TextureLoader()
-imgLoad.load('/Billeder/ild.jpg', texture => {
+imgLoad.load('/Billeder/intens.jpg', texture => {
   scene.background = texture
 })
 
 // Tekst
 let textMesh // global variabel til animation
 const fontLoader = new FontLoader()
-fontLoader.load('/Fonts/Oi.json', font => {
-  const textGeo = new TextGeometry('Griller', {
+fontLoader.load('/Fonts/Maguntiak.json', font => {
+  const textGeo = new TextGeometry('Intens', {
     font: font,
     size: 1,
     height: 0.5,
+    shininess: 1000,
     curveSegments: 12,
   })
 
  textGeo.center() // centrer geometrien, rotation fra midten
- const loader = new THREE.TextureLoader()
-const texture = loader.load('/Billeder/beef.jpeg')
-texture.colorSpace = THREE.SRGBColorSpace
-texture.wrapS = THREE.RepeatWrapping
-texture.wrapT = THREE.RepeatWrapping
-texture.repeat.set(2, 1)
 
-  const textMaterial = new THREE.MeshPhongMaterial({
-    map: texture,        // billede som farve
-    shininess: 10,       // lidt glans
-    specular: 0x8F756E  // mørk highlight
-  })
-
+  const textMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 })
   textMesh = new THREE.Mesh(textGeo, textMaterial)
   scene.add(textMesh)
 })
 
-// Fog
-const fogColor = 0xFF0000 // rødlig tåge
-const near = 5
-const far = 4
-scene.fog = new THREE.Fog(fogColor, near, far)
 
 // Animation
+let shakeTime = 0
 function animate() {
   requestAnimationFrame(animate)
   if (textMesh) {
-    textMesh.rotation.x += 0.01
-    textMesh.rotation.y += 0
+    // Roter stadig lidt på X for at bevare bevægelse
+    textMesh.rotation.x += 0
+
+    // Voldsom rysten fra højre til venstre
+    shakeTime += 3 // hastigheden på rysten
+    textMesh.position.x = Math.sin(shakeTime) * 0.5 // amplitude (0.5 = voldsom)
   }
   renderer.render(scene, camera)
 }
